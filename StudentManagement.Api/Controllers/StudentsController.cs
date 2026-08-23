@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudentManagement.Api.Models; // Added this to access new Models
+using StudentManagement.Api.Dtos; // Added this to access new Dtos
 
 namespace StudentManagement.Api.Controllers
 {
@@ -19,10 +20,10 @@ namespace StudentManagement.Api.Controllers
         //Task 3: Create a static list of departments
         private static List<Department> departments = new List<Department>
         {
-            new Department { ID = 1, Name = "IT" },
-            new Department { ID = 2, Name = "HR" },
-            new Department { ID = 3, Name = "Finance" },
-            new Department {ID = 4, Name = "Sales" }
+            new Department { Id = 1, Name = "IT" },
+            new Department { Id = 2, Name = "HR" },
+            new Department { Id = 3, Name = "Finance" },
+            new Department {Id = 4, Name = "Sales" }
         };
 
         //Task 2: Welcome Endpoint (GET /api/students/welcome)
@@ -36,7 +37,15 @@ namespace StudentManagement.Api.Controllers
         [HttpGet]
         public IActionResult GetAllStudents()
         {
-            return Ok(students);
+            var studentDtos = students.Select(s => new StudentDetailsDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Age = s.Age,
+                DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+            }).ToList();
+
+            return Ok(studentDtos);
         }
 
         //Task 4: Get SStudent By Id (GET /api/students/{id})
@@ -54,7 +63,15 @@ namespace StudentManagement.Api.Controllers
             else
             {
                 //If a student is found, return the student object with a 200 OK response
-                return Ok(student);
+                var studentDto = new StudentDetailsDto
+                {
+                    Id = student.Id,
+                    Name = student.Name,
+                    Age = student.Age,
+                    DepartmentName = departments.FirstOrDefault(d => d.Id == student.DepartmentId)?.Name ?? "Unknown"
+                };
+
+                return Ok(studentDto);
             }
         }
 
@@ -71,6 +88,13 @@ namespace StudentManagement.Api.Controllers
             //Find all students whose name contains the search string (ignoring uppercase/lowercase)
             var matchingStudents = students
                 .Where(s => s.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                .Select(s=> new StudentDetailsDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Age = s.Age,
+                    DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+                })
                 .ToList();
 
             //Return the results
@@ -85,6 +109,13 @@ namespace StudentManagement.Api.Controllers
             var filteredStudents = students
                 .Where(s => s.Age >= 18 && s.Age <= 22)
                 .OrderBy(s => s.Age)
+                .Select(s => new StudentDetailsDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Age = s.Age,
+                    DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+                })
                 .ToList();
 
             //Return the results
@@ -93,13 +124,18 @@ namespace StudentManagement.Api.Controllers
 
         // Task 7: Add New Stuent In Memory (POST /api/students)
         [HttpPost]
-        public IActionResult AddStudent([FromBody] Student newStudent)
+        public IActionResult AddStudent([FromBody] CreateStudentDto dto)
         {
             //1.Generate a new ID automatically (find the highest current ID and add 1)
             int newId = students.Max(s => s.Id) + 1;
 
-            //2.Assign the new ID to the incoming student data
-            newStudent.Id = newId;
+            var newStudent = new Student
+            {
+                Id = newId,
+                Name = dto.Name,
+                Age = dto.Age,
+                DepartmentId = dto.DepartmentId
+            };
 
             //3. Add the new student to our static list
             students.Add(newStudent);
@@ -110,7 +146,7 @@ namespace StudentManagement.Api.Controllers
 
         //Task 8: Edit Student In Memory (PUT /api/students/{id})
         [HttpPut("{id}")]
-        public IActionResult EditStudent(int id, [FromBody] Student updatedStudent)
+        public IActionResult EditStudent(int id, [FromBody] UpdateStudentDto dto)
         {
             //1. Fond the exsting studdent in the list
             var existingStudent = students.FirstOrDefault(s => s.Id == id);
@@ -122,9 +158,9 @@ namespace StudentManagement.Api.Controllers
             }
 
             //3. Update their information
-            existingStudent.Name = updatedStudent.Name;
-            existingStudent.Age = updatedStudent.Age;
-            existingStudent.DepartmentId = updatedStudent.DepartmentId;
+            existingStudent.Name = dto.Name;
+            existingStudent.Age = dto.Age;
+            existingStudent.DepartmentId = dto.DepartmentId;
 
             //4. Return an OK response with the updated student
             return Ok(existingStudent);
