@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.X509Certificates;
+using StudentManagement.Api.Models; // Added this to access new Models
 
 namespace StudentManagement.Api.Controllers
 {
@@ -11,9 +11,18 @@ namespace StudentManagement.Api.Controllers
 
         private static List<Student> students = new List<Student>
         {
-            new Student { Id = 1, Name = "Ahmed", Age = 20, DepartmentName = "Computer Science" },
-            new Student { Id = 2, Name = "Sara", Age = 22, DepartmentName = "Engineering" },
-            new Student { Id = 3, Name = "Omar", Age = 19, DepartmentName = "Information Technology"}
+            new Student { Id = 1, Name = "Ahmed", Age = 20, DepartmentId = 1 },
+            new Student { Id = 2, Name = "Sara", Age = 22, DepartmentId = 2 },
+            new Student { Id = 3, Name = "Omar", Age = 19, DepartmentId = 3 }
+        };
+
+        //Task 3: Create a static list of departments
+        private static List<Department> departments = new List<Department>
+        {
+            new Department { ID = 1, Name = "IT" },
+            new Department { ID = 2, Name = "HR" },
+            new Department { ID = 3, Name = "Finance" },
+            new Department {ID = 4, Name = "Sales" }
         };
 
         //Task 2: Welcome Endpoint (GET /api/students/welcome)
@@ -66,8 +75,8 @@ namespace StudentManagement.Api.Controllers
 
             //Return the results
             return Ok(matchingStudents);
-
         }
+
         // Task 6: Filter Students by Age (GET /api/students/filter-by-age)
         [HttpGet("filter-by-age")]
         public IActionResult FilterByAge()
@@ -115,7 +124,7 @@ namespace StudentManagement.Api.Controllers
             //3. Update their information
             existingStudent.Name = updatedStudent.Name;
             existingStudent.Age = updatedStudent.Age;
-            existingStudent.DepartmentName = updatedStudent.DepartmentName;
+            existingStudent.DepartmentId = updatedStudent.DepartmentId;
 
             //4. Return an OK response with the updated student
             return Ok(existingStudent);
@@ -142,16 +151,5 @@ namespace StudentManagement.Api.Controllers
                 return Ok($"Student with ID {id} has been deleted successfully.");
             }
         }
-    
     }
-
-        public class Student
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public int Age { get; set; }
-            public string DepartmentName { get; set; }
-        }
-
 }
- 
