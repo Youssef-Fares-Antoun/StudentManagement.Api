@@ -84,8 +84,16 @@ namespace StudentManagement.Api.Controllers
         [HttpPost]
         public IActionResult AddStudent([FromBody] CreateStudentDto dto)
         {
-            // Pass the incoming DTO directly to the service. The service handles 
-            // ID generation, mapping to the model, and saving to the list.
+            // 1. Check if the provided DepartmentId exists in our shared Departments list
+            bool isValidDepartment = DepartmentsController.Departments.Any(d => d.Id == dto.DepartmentId);
+
+            // 2. If it doesn't exist, return a 400 Bad Request immediately
+            if (!isValidDepartment)
+            {
+                return BadRequest($"Validation failed: Department with ID {dto.DepartmentId} does not exist.");
+            }
+
+            // 3. If valid, proceed with adding the student via the service
             var newStudent = _studentService.AddStudent(dto);
             return Ok(newStudent);
         }
@@ -94,11 +102,17 @@ namespace StudentManagement.Api.Controllers
         [HttpPut("{id}")]
         public IActionResult EditStudent(int id, [FromBody] UpdateStudentDto dto)
         {
-            // The service tries to update the student and returns the updated model, 
-            // or null if the student wasn't found.
+            // 1. Validate the new DepartmentId
+            bool isValidDepartment = DepartmentsController.Departments.Any(d => d.Id == dto.DepartmentId);
+
+            if (!isValidDepartment)
+            {
+                return BadRequest($"Validation failed: Department with ID {dto.DepartmentId} does not exist.");
+            }
+
+            // 2. If valid, proceed with the update
             var updatedStudent = _studentService.UpdateStudent(id, dto);
 
-            // The controller handles the HTTP response based on the service's result
             if (updatedStudent == null)
             {
                 return NotFound($"Cannot edit: Student with ID {id} not found.");

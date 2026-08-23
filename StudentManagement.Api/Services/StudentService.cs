@@ -1,5 +1,6 @@
 ﻿using StudentManagement.Api.Dtos;
 using StudentManagement.Api.Models;
+using StudentManagement.Api.Controllers;    
 
 namespace StudentManagement.Api.Services
 {
@@ -9,19 +10,11 @@ namespace StudentManagement.Api.Services
     {
         // We moved the static lists from the Controller to the Service!
         // These lists act as our temporary "in-memory database" while the application is running.
-        private static List<Student> students = new List<Student>
+        private static List<Student> students = new List<Student>   
         {
             new Student { Id = 1, Name = "Ahmed", Age = 20, DepartmentId = 1 },
             new Student { Id = 2, Name = "Sara", Age = 22, DepartmentId = 2 },
             new Student { Id = 3, Name = "Omar", Age = 19, DepartmentId = 3 }
-        };
-
-        private static List<Department> departments = new List<Department>
-        {
-            new Department { Id = 1, Name = "IT" },
-            new Department { Id = 2, Name = "HR" },
-            new Department { Id = 3, Name = "Finance" },
-            new Department { Id = 4, Name = "Sales" }
         };
 
         // Retrieves all students and converts them into DTOs before sending them back.
@@ -34,7 +27,7 @@ namespace StudentManagement.Api.Services
                 Name = s.Name,
                 Age = s.Age,
                 // We search the departments list to find the matching name. If not found, we default to "Unknown".
-                DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+                DepartmentName = DepartmentsController.Departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
             }).ToList();
         }
 
@@ -53,7 +46,7 @@ namespace StudentManagement.Api.Services
                 Id = student.Id,
                 Name = student.Name,
                 Age = student.Age,
-                DepartmentName = departments.FirstOrDefault(d => d.Id == student.DepartmentId)?.Name ?? "Unknown"
+                DepartmentName = DepartmentsController.Departments.FirstOrDefault(d => d.Id == student.DepartmentId)?.Name ?? "Unknown"
             };
         }
 
@@ -69,7 +62,7 @@ namespace StudentManagement.Api.Services
                     Id = s.Id,
                     Name = s.Name,
                     Age = s.Age,
-                    DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+                    DepartmentName = DepartmentsController.Departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
                 })
                 .ToList(); // Executes the query and returns it as a List.
         }
@@ -88,7 +81,7 @@ namespace StudentManagement.Api.Services
                     Id = s.Id,
                     Name = s.Name,
                     Age = s.Age,
-                    DepartmentName = departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
+                    DepartmentName = DepartmentsController.Departments.FirstOrDefault(d => d.Id == s.DepartmentId)?.Name ?? "Unknown"
                 })
                 .ToList();
         }
