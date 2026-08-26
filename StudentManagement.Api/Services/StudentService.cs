@@ -47,18 +47,24 @@ namespace StudentManagement.Api.Services
             };
         }
 
-        // Finds all students whose name contains the search string.
-        public List<StudentDetailsDto> SearchStudents(string name)
+        // Finds students where the student name OR department name contains the search text
+        public List<StudentDetailsDto> SearchStudents(string text)
         {
-            // 1. Get the filtered students from the database first
-            var filteredStudents = _context.Students
-                .Where(s => s.Name.Contains(name)) // Removed StringComparison because SQL Server handles case-insensitivity automatically
+            // 1. Find the IDs of any departments that match the search text
+            var matchingDepartmentIds = _context.Departments
+                .Where(d => d.Name.Contains(text))
+                .Select(d => d.Id)
                 .ToList();
 
-            // 2. Get departments for mapping
+            // 2. Find students whose name matches the text OR whose DepartmentId is in our matched list
+            var filteredStudents = _context.Students
+                .Where(s => s.Name.Contains(text) || matchingDepartmentIds.Contains(s.DepartmentId))
+                .ToList();
+
+            // 3. Get all departments for the DTO mapping
             var allDepartments = _context.Departments.ToList();
 
-            // 3. Map to DTOs in memory (where the ?. operator is allowed)
+            // 4. Map the results to DTOs
             return filteredStudents.Select(s => new StudentDetailsDto
             {
                 Id = s.Id,

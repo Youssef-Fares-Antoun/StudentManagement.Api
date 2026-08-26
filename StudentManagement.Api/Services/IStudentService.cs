@@ -7,7 +7,7 @@ namespace StudentManagement.Api.Services
     {
         List<StudentDetailsDto> GetAllStudents();
         StudentDetailsDto? GetStudentById(int id);
-        List<StudentDetailsDto> SearchStudents(string name);
+        List<StudentDetailsDto> SearchStudents(string text);
         List<StudentDetailsDto> FilterByAge();
         Student AddStudent(CreateStudentDto dto);
         //The ? Below means that the method is allowed to return null
