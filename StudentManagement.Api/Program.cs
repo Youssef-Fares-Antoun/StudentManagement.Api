@@ -3,14 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using StudentManagement.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-//Registering the ApplicationDbContext and tell it to use SQL Server with our connection string
+
+// Registering the ApplicationDbContext and tell it to use SQL Server with our connection string
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
+// Registering our custom services to be scoped to the HTTP request
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
