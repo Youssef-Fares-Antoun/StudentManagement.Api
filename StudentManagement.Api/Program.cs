@@ -1,6 +1,11 @@
 using StudentManagement.Api.Services;
+using Microsoft.EntityFrameworkCore;
+using StudentManagement.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+//Registering the ApplicationDbContext and tell it to use SQL Server with our connection string
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 
