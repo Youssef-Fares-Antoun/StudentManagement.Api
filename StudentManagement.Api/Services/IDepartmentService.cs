@@ -1,4 +1,5 @@
 ﻿using StudentManagement.Api.Models;
+using StudentManagement.Api.Dtos; // Added this!
 
 namespace StudentManagement.Api.Services
 {
@@ -9,5 +10,8 @@ namespace StudentManagement.Api.Services
         Department AddDepartment(Department department);
         Department UpdateDepartment(int id, Department updatedDepartment);
         bool DeleteDepartment(int id);
+
+        // Task 12 definition
+        List<DepartmentStatisticsDto> GetDepartmentStatistics();
     }
 }

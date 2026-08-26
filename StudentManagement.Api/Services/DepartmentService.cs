@@ -1,5 +1,6 @@
 ﻿using StudentManagement.Api.Data;
 using StudentManagement.Api.Models;
+using StudentManagement.Api.Dtos; 
 
 namespace StudentManagement.Api.Services
 {
@@ -7,7 +8,7 @@ namespace StudentManagement.Api.Services
     {
         private readonly ApplicationDbContext _context;
 
-        //Injecting the daatabase context 
+        //Injecting the database context 
         public DepartmentService(ApplicationDbContext context)
         {
             _context = context;
@@ -50,6 +51,28 @@ namespace StudentManagement.Api.Services
             _context.Departments.Remove(existing);
             _context.SaveChanges();
             return true;
+        }
+
+        // Task 12: Department Statistics
+        public List<DepartmentStatisticsDto> GetDepartmentStatistics()
+        {
+            // Pull the data from the database first
+            var departments = _context.Departments.ToList();
+            var students = _context.Students.ToList();
+
+            // Calculate the stats in memory using your exact DTO properties
+            return departments.Select(d => {
+                var deptStudents = students.Where(s => s.DepartmentId == d.Id).ToList();
+
+                return new DepartmentStatisticsDto
+                {
+                    DepartmentName = d.Name,
+                    StudentCount = deptStudents.Count,
+                    AverageAge = deptStudents.Any() ? deptStudents.Average(s => s.Age) : 0,
+                    OldestAge = deptStudents.Any() ? deptStudents.Max(s => s.Age) : null,
+                    YoungestAge = deptStudents.Any() ? deptStudents.Min(s => s.Age) : null
+                };
+            }).ToList();
         }
     }
 }
