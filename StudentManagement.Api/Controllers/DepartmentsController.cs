@@ -41,10 +41,16 @@ namespace StudentManagement.Api.Controllers
         [HttpPost]
         public IActionResult AddDepartment([FromBody] Department newDepartment)
         {
-            // Task 14: Department Validation
+            // Task 14: Department Validation (Name is required)
             if (string.IsNullOrWhiteSpace(newDepartment.Name))
             {
                 return BadRequest("Department Name is required.");
+            }
+
+            // Task 14: Department Validation (Name must not be duplicated)
+            if (!_departmentService.IsDepartmentNameUnique(newDepartment.Name))
+            {
+                return BadRequest("Validation failed: A department with this name already exists.");
             }
 
             var createdDepartment = _departmentService.AddDepartment(newDepartment);
@@ -55,10 +61,16 @@ namespace StudentManagement.Api.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateDepartment(int id, [FromBody] Department updatedDepartment)
         {
-            // Task 14: Department Validation
+            // Task 14: Department Validation (Name is required)
             if (string.IsNullOrWhiteSpace(updatedDepartment.Name))
             {
                 return BadRequest("Department Name is required.");
+            }
+
+            // Task 14: Department Validation (Name must not be duplicated)
+            if (!_departmentService.IsDepartmentNameUnique(updatedDepartment.Name, id))
+            {
+                return BadRequest("Validation failed: A department with this name already exists.");
             }
 
             var existingDepartment = _departmentService.UpdateDepartment(id, updatedDepartment);
@@ -88,7 +100,6 @@ namespace StudentManagement.Api.Controllers
         [HttpGet("statistics")]
         public IActionResult GetDepartmentStatistics()
         {
-            // Fully delegated to the database service!
             var stats = _departmentService.GetDepartmentStatistics();
             return Ok(stats);
         }
@@ -97,7 +108,6 @@ namespace StudentManagement.Api.Controllers
         [HttpGet("highest-lowest")]
         public IActionResult GetHighestAndLowestDepartment()
         {
-            // Fully delegated to the database service!
             var result = _departmentService.GetHighestAndLowestDepartments();
             return Ok(result);
         }

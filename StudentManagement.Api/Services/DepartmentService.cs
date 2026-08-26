@@ -1,6 +1,6 @@
 ﻿using StudentManagement.Api.Data;
 using StudentManagement.Api.Models;
-using StudentManagement.Api.Dtos; 
+using StudentManagement.Api.Dtos;
 
 namespace StudentManagement.Api.Services
 {
@@ -8,7 +8,6 @@ namespace StudentManagement.Api.Services
     {
         private readonly ApplicationDbContext _context;
 
-        //Injecting the database context 
         public DepartmentService(ApplicationDbContext context)
         {
             _context = context;
@@ -26,7 +25,6 @@ namespace StudentManagement.Api.Services
 
         public Department AddDepartment(Department department)
         {
-            // SQL Server will auto-generate the ID
             _context.Departments.Add(department);
             _context.SaveChanges();
             return department;
@@ -56,11 +54,9 @@ namespace StudentManagement.Api.Services
         // Task 12: Department Statistics
         public List<DepartmentStatisticsDto> GetDepartmentStatistics()
         {
-            // Pull the data from the database first
             var departments = _context.Departments.ToList();
             var students = _context.Students.ToList();
 
-            // Calculate the stats in memory using your exact DTO properties
             return departments.Select(d => {
                 var deptStudents = students.Where(s => s.DepartmentId == d.Id).ToList();
 
@@ -74,32 +70,36 @@ namespace StudentManagement.Api.Services
                 };
             }).ToList();
         }
+
         // Task 13: Highest and Lowest Department
         public DepartmentExtremesDto GetHighestAndLowestDepartments()
         {
-            // 1. Reuse the logic we just wrote to get all stats!
             var stats = GetDepartmentStatistics();
 
-            // 2. If there are no departments at all, return an empty DTO
             if (!stats.Any())
             {
                 return new DepartmentExtremesDto();
             }
 
-            // 3. Find the maximum and minimum student counts
             int maxStudents = stats.Max(s => s.StudentCount);
             int minStudents = stats.Min(s => s.StudentCount);
 
-            // 4. Find all departments that match those counts (handles ties automatically)
             var highest = stats.Where(s => s.StudentCount == maxStudents).ToList();
             var lowest = stats.Where(s => s.StudentCount == minStudents).ToList();
 
-            // 5. Return the combined result
             return new DepartmentExtremesDto
             {
                 Highest = highest,
                 Lowest = lowest
             };
+        }
+
+        // Task 14: Check for Duplicate Department Names
+        public bool IsDepartmentNameUnique(string name, int currentId = 0)
+        {
+            // If currentId is 0 (adding), it checks if the name exists anywhere.
+            // If currentId > 0 (updating), it checks if the name belongs to a DIFFERENT department.
+            return !_context.Departments.Any(d => d.Name.ToLower() == name.ToLower() && d.Id != currentId);
         }
     }
 }

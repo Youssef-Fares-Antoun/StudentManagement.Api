@@ -1,5 +1,5 @@
 ﻿using StudentManagement.Api.Models;
-using StudentManagement.Api.Dtos; // Added this!
+using StudentManagement.Api.Dtos;
 
 namespace StudentManagement.Api.Services
 {
@@ -16,5 +16,8 @@ namespace StudentManagement.Api.Services
 
         // Task 13 definition
         DepartmentExtremesDto GetHighestAndLowestDepartments();
+
+        // Task 14 definition
+        bool IsDepartmentNameUnique(string name, int currentId = 0);
     }
 }
