@@ -13,5 +13,8 @@ namespace StudentManagement.Api.Services
 
         // Task 12 definition
         List<DepartmentStatisticsDto> GetDepartmentStatistics();
+
+        // Task 13 definition
+        DepartmentExtremesDto GetHighestAndLowestDepartments();
     }
 }

@@ -74,5 +74,32 @@ namespace StudentManagement.Api.Services
                 };
             }).ToList();
         }
+        // Task 13: Highest and Lowest Department
+        public DepartmentExtremesDto GetHighestAndLowestDepartments()
+        {
+            // 1. Reuse the logic we just wrote to get all stats!
+            var stats = GetDepartmentStatistics();
+
+            // 2. If there are no departments at all, return an empty DTO
+            if (!stats.Any())
+            {
+                return new DepartmentExtremesDto();
+            }
+
+            // 3. Find the maximum and minimum student counts
+            int maxStudents = stats.Max(s => s.StudentCount);
+            int minStudents = stats.Min(s => s.StudentCount);
+
+            // 4. Find all departments that match those counts (handles ties automatically)
+            var highest = stats.Where(s => s.StudentCount == maxStudents).ToList();
+            var lowest = stats.Where(s => s.StudentCount == minStudents).ToList();
+
+            // 5. Return the combined result
+            return new DepartmentExtremesDto
+            {
+                Highest = highest,
+                Lowest = lowest
+            };
+        }
     }
 }
